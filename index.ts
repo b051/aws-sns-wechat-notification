@@ -4,7 +4,7 @@ import * as parse from 'co-body'
 
 const app = new Koa()
 const Receipients = {
-  '1000002': ['b051']
+  '1000002': ['b051', 'YuJing']
 }
 
 const WX = 'https://qyapi.weixin.qq.com/cgi-bin'
