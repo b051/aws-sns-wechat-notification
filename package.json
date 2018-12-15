@@ -10,6 +10,7 @@
     "superagent": "^4.0.0"
   },
   "devDependencies": {
+    "@types/co-body": "^0.0.3",
     "@types/koa": "^2.0.47",
     "@types/node": "^10.12.15",
     "@types/superagent": "^3.8.5",
