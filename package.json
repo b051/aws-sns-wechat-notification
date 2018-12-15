@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "start": "node build/index.js",
+    "build": "npx tsc",
+    "postinstall": "npm run build"
+  },
+  "dependencies": {
+    "co-body": "^6.0.0",
+    "koa": "^2.6.2",
+    "superagent": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.0.47",
+    "@types/node": "^10.12.15",
+    "@types/superagent": "^3.8.5",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2"
+  }
+}

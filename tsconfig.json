@@ -1,0 +1,26 @@
+{
+  "include": [
+    "**/*"
+  ],
+  "exclude": [
+    "test"
+  ],
+  "compilerOptions": {
+    "lib": [
+      "es2017"
+    ],
+    "types": [
+      "node"
+    ],
+    "outDir": "build",
+    "module": "commonjs",
+    "target": "es2017",
+    "sourceMap": false,
+    "noImplicitAny": false,
+    "allowJs": false,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "skipLibCheck": true
+  }
+}
