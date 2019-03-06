@@ -20,7 +20,7 @@ const wxsend = async (agentid: string, subject: string, message: string) => {
   if (typeof(message) === 'string') {
     if (message.endsWith('}')) {
       const idx = message.indexOf('{')
-      if (idx > 0) {
+      if (idx >= 0) {
         try {
           message = JSON.parse(message.substr(idx))
         } catch (error) {
