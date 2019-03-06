@@ -4,7 +4,7 @@ import * as parse from 'co-body'
 
 const app = new Koa()
 const Receipients = {
-  '1000002': ['b051', 'YuJing', 'stevexu']
+//   '1000002': ['b051', 'YuJing', 'stevexu']
 }
 
 const WX = 'https://qyapi.weixin.qq.com/cgi-bin'
@@ -30,9 +30,17 @@ const wxsend = async (agentid: string, subject: string, message: string) => {
       }
     }
   }
-  
+
+  const receipients = Receipients[agentid]
+  let touser: string
+  if (Array.isArray(receipients)) {
+    touser = receipients.join('|')
+  } else {
+    touser = "@all"
+  }
+  // https://work.weixin.qq.com/api/doc#90000/90135/90236
   const res = await request.post(`${WX}/message/send`).query({ access_token }).send({
-    touser: Receipients[agentid].join('|'),
+    touser,
     msgtype: 'text',
     agentid,
     text: { content },
