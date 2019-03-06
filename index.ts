@@ -16,19 +16,27 @@ const wxsend = async (agentid: string, subject: string, message: string) => {
     setTimeout(() => access_token = null, res.body.expires_in * 1000)
   }
   
-  let content = `${subject}: ${message}`
-  if (message.endsWith('}')) {
-    const idx = message.indexOf('{')
-    if (idx > 0) {
-      try {
-        const json = JSON.parse(message.substr(idx))
-        const { applicationName, deploymentId, deploymentGroupName, status } = json
-        if (status) {
-          content = `${applicationName}/${deploymentGroupName} ${status} (deploymentId=${deploymentId})`
+  let content: string
+  if (typeof(message) === 'string') {
+    if (message.endsWith('}')) {
+      const idx = message.indexOf('{')
+      if (idx > 0) {
+        try {
+          message = JSON.parse(message.substr(idx))
+        } catch (error) {
         }
-      } catch (error) {
       }
     }
+  }
+  if (typeof(message) === 'object') {
+    const { applicationName, deploymentId, deploymentGroupName, status } = message
+    if (status) {
+      content = `${applicationName}/${deploymentGroupName} ${status} (deploymentId=${deploymentId})`
+    } else {
+      content = `${subject}\n${JSON.stringify(message, null, 2)}`
+    }
+  } else {
+    content = `${subject}: ${message}`
   }
 
   const receipients = Receipients[agentid]
