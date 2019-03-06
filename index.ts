@@ -4,7 +4,7 @@ import * as parse from 'co-body'
 
 const app = new Koa()
 const Receipients = {
-  '1000002': ['b051', 'YuJing']
+  '1000002': ['b051', 'YuJing', 'stevexu']
 }
 
 const WX = 'https://qyapi.weixin.qq.com/cgi-bin'
@@ -16,13 +16,26 @@ const wxsend = async (agentid: string, subject: string, message: string) => {
     setTimeout(() => access_token = null, res.body.expires_in * 1000)
   }
   
+  let content = `${subject}: ${message}`
+  if (message.endsWith('}')) {
+    const idx = message.indexOf('{')
+    if (idx > 0) {
+      try {
+        const json = JSON.parse(message.substr(idx))
+        const { applicationName, deploymentId, deploymentGroupName, status } = json
+        if (status) {
+          content = `${applicationName}/${deploymentGroupName} ${status} (deploymentId=${deploymentId})`
+        }
+      } catch (error) {
+      }
+    }
+  }
+  
   const res = await request.post(`${WX}/message/send`).query({ access_token }).send({
     touser: Receipients[agentid].join('|'),
     msgtype: 'text',
     agentid,
-    text: {
-      content: `${subject}: ${message}`
-    },
+    text: { content },
     safe: 0
   })
   return res
