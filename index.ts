@@ -28,6 +28,7 @@ const wxsend = async (agentid: string, subject: string, message: string) => {
       }
     }
   }
+  console.log({ message, subject })
   if (typeof(message) === 'object') {
     const { applicationName, deploymentId, deploymentGroupName, status } = message
     if (status) {
