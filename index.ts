@@ -3,36 +3,34 @@ import * as request from 'superagent'
 import * as parse from 'co-body'
 
 const app = new Koa()
-const Receipients = {
-//   '1000002': ['b051', 'YuJing', 'stevexu']
+const CORP_SECRET = {
+  '1000002': 'm3hof58HyJhozBTdpfNdSrmgOtsV3YCj6SUn7ogO8qM',
+  '1000003': 'TWH170it10JTzQ5LkuY8AtBkIiy0mzGYW6C3bDRiHPw'
 }
 
 const WX = 'https://qyapi.weixin.qq.com/cgi-bin'
 let access_token
 const wxsend = async (agentid: string, subject: string, message: string) => {
   if (!access_token) {
-    const res = await request.get(`${WX}/gettoken`).query({ corpid: process.env.CORP_ID, corpsecret: process.env.CORP_SECRET })
+    const res = await request.get(`${WX}/gettoken`).query({ corpid: process.env.CORP_ID, corpsecret: CORP_SECRET[agentid] })
     access_token = res.body.access_token
     setTimeout(() => access_token = null, res.body.expires_in * 1000)
   }
   
   let content: string
   if (typeof(message) === 'string') {
-    if (message.endsWith('}')) {
-      const idx = message.indexOf('{')
-      if (idx >= 0) {
-        try {
-          message = JSON.parse(message.substr(idx))
-        } catch (error) {
-        }
-      }
+    try {
+      message = JSON.parse(message)
+    } catch (error) {
     }
   }
   console.log({ message, subject })
   if (typeof(message) === 'object') {
-    const { applicationName, deploymentId, deploymentGroupName, status } = message
+    const { applicationName, deploymentId, deploymentGroupName, instanceStatus, status } = message
     if (status) {
-      content = `${applicationName}/${deploymentGroupName} ${status} (deploymentId=${deploymentId})`
+      content = `${applicationName}/${deploymentGroupName} Deploy ${status} (deploymentId=${deploymentId})`
+    } else if (instanceStatus) {
+      content = `${applicationName}/${deploymentGroupName} Deploy ${status} (deploymentId=${deploymentId})`
     } else {
       content = `${subject}\n${JSON.stringify(message, null, 2)}`
     }
@@ -40,16 +38,9 @@ const wxsend = async (agentid: string, subject: string, message: string) => {
     content = `${subject}: ${message}`
   }
 
-  const receipients = Receipients[agentid]
-  let touser: string
-  if (Array.isArray(receipients)) {
-    touser = receipients.join('|')
-  } else {
-    touser = "@all"
-  }
   // https://work.weixin.qq.com/api/doc#90000/90135/90236
   const res = await request.post(`${WX}/message/send`).query({ access_token }).send({
-    touser,
+    touser: "@all",
     msgtype: 'text',
     agentid,
     text: { content },
