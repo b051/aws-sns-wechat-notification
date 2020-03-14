@@ -9,12 +9,13 @@ const CORP_SECRET = {
 }
 
 const WX = 'https://qyapi.weixin.qq.com/cgi-bin'
-let access_token
+let access_token: string
+let expires_at: number
 const wxsend = async (agentid: string, subject: string, message: string) => {
-  if (!access_token) {
+  if (!expires_at || Date.now() > expires_at) {
     const res = await request.get(`${WX}/gettoken`).query({ corpid: process.env.CORP_ID, corpsecret: CORP_SECRET[agentid] })
     access_token = res.body.access_token
-    setTimeout(() => access_token = null, res.body.expires_in * 1000)
+    expires_at = Date.now() + (res.body.expires_in - 10) * 1000
   }
   
   let content: string
