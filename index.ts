@@ -5,13 +5,16 @@ import * as parse from 'co-body'
 const app = new Koa()
 
 const WX = 'https://qyapi.weixin.qq.com/cgi-bin'
-let access_token: string
-let expires_at: number
+const access_tokens = new Map<string, { token: string, expires_at: number }>()
+
 const wxsend = async (agentid: string, subject: string, message: string) => {
-  if (!access_token || !expires_at || Date.now() > expires_at) {
+  const _token = access_tokens.get(agentid)
+  if (!_token || Date.now() > _token.expires_at) {
     const res = await request.get(`${WX}/gettoken`).query({ corpid: process.env.CORP_ID, corpsecret: process.env[`CORP_${agentid}`] })
-    access_token = res.body.access_token
-    expires_at = Date.now() + (res.body.expires_in - 120) * 1000
+    access_tokens.set(agentid, {
+      token: res.body.access_token,
+      expires_at: Date.now() + (res.body.expires_in - 120) * 1000
+    })
   }
   
   let content: string
@@ -36,7 +39,7 @@ const wxsend = async (agentid: string, subject: string, message: string) => {
   }
 
   // https://work.weixin.qq.com/api/doc#90000/90135/90236
-  const res = await request.post(`${WX}/message/send`).query({ access_token }).send({
+  const res = await request.post(`${WX}/message/send`).query({ access_token: _token.token }).send({
     touser: "@all",
     msgtype: 'text',
     agentid,
