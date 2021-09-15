@@ -3,17 +3,13 @@ import * as request from 'superagent'
 import * as parse from 'co-body'
 
 const app = new Koa()
-const CORP_SECRET = {
-  '1000002': 'm3hof58HyJhozBTdpfNdSrmgOtsV3YCj6SUn7ogO8qM',
-  '1000003': 'TWH170it10JTzQ5LkuY8AtBkIiy0mzGYW6C3bDRiHPw'
-}
 
 const WX = 'https://qyapi.weixin.qq.com/cgi-bin'
 let access_token: string
 let expires_at: number
 const wxsend = async (agentid: string, subject: string, message: string) => {
   if (!access_token || !expires_at || Date.now() > expires_at) {
-    const res = await request.get(`${WX}/gettoken`).query({ corpid: process.env.CORP_ID, corpsecret: CORP_SECRET[agentid] })
+    const res = await request.get(`${WX}/gettoken`).query({ corpid: process.env.CORP_ID, corpsecret: process.env[`CORP_${agentid}`] })
     access_token = res.body.access_token
     expires_at = Date.now() + (res.body.expires_in - 120) * 1000
   }
