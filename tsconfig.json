@@ -3,7 +3,7 @@
     "**/*"
   ],
   "exclude": [
-    "test"
+    "test", "build", "node_modules"
   ],
   "compilerOptions": {
     "lib": [

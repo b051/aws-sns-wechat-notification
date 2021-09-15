@@ -58,7 +58,7 @@ app.use(async ctx => {
   } else if (messageType === 'Notification') {
     const { Subject, Message } = await parse.json(ctx)
     const { agentid } = ctx.request.query
-    const res = await wxsend(agentid, Subject, Message)
+    const res = await wxsend(agentid as string, Subject, Message)
     ctx.body = res.body
   } else {
     ctx.status = 404
